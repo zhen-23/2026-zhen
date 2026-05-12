@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, make_response, jsonify
 from datetime import datetime
 import random
 
