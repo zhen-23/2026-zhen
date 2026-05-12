@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 
-from flask import Flask, render_template, request , make_response, jsonify
+from flask import Flask, render_template, request
 from datetime import datetime
 import random
 
@@ -30,7 +30,7 @@ app = Flask(__name__)
 def index():
     return render_template("index.html")
 
-@app.route("/webhook", methods=["POST"])
+    @app.route("/webhook", methods=["POST"])
 def webhook():
     # build a request object
     req = request.get_json(force=True)
@@ -40,9 +40,11 @@ def webhook():
     #info = "我是楊子青設計的電影聊天機器人, 動作：" + action + "； 查詢內容：" + msg
     if (action == "rateChoice"):
         rate =  req["queryResult"]["parameters"]["rate"]
-        info = "我是蔡純珍設計的電影聊天機器人, 您選擇的電影分級是：" + rate
+        info = "我是楊子青設計的電影聊天機器人, 您選擇的電影分級是：" + rate
 
     return make_response(jsonify({"fulfillmentText": info}))
+
+
 
     @app.route("/rate")
 def rate():
@@ -105,6 +107,7 @@ def rate():
         doc_ref = db.collection("本週新片含分級").document(movie_id)
         doc_ref.set(doc)
     return "本週新片已爬蟲及存檔完畢，網站最近更新日期為：" + lastUpdate
+
 
 @app.route("/weather", methods=["GET", "POST"])
 def weather_query():
