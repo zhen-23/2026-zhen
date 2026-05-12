@@ -375,9 +375,6 @@ def cup():
             "message": msg
         }
         
-    return render_template('cup.html', result=result)
-
-
 
     return render_template('cup.html', result=result)
 if __name__ == "__main__":
