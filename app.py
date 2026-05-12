@@ -30,7 +30,8 @@ app = Flask(__name__)
 def index():
     return render_template("index.html")
 
-    @app.route("/webhook", methods=["POST"])
+
+@app.route("/webhook", methods=["POST"])
 def webhook():
     # build a request object
     req = request.get_json(force=True)
@@ -46,7 +47,7 @@ def webhook():
 
 
 
-    @app.route("/rate")
+@app.route("/rate")
 def rate():
     #本週新片
     url = "https://www.atmovies.com.tw/movie/new/"
@@ -138,6 +139,7 @@ def weather_query():
                 
     return render_template("weather.html", result=result_text)
 
+
 @app.route("/road")
 def road():
     R = ""
@@ -150,7 +152,7 @@ def road():
         R += item["路口名稱"] + ",總共發生" + item["總件數"] + "件事故<br>"
     return R
 
-@app.route("/movie2", methods=["GET", "POST"])
+@app.route("/movie3", methods=["GET", "POST"])
 def movie3():
     db = firestore.client()
     results = []
@@ -176,7 +178,7 @@ def movie3():
     return render_template("movie3.html", results=results, keyword=keyword)
 
 
-@app.route("/movie3")
+@app.route("/movie2")
 def movie2():
   url = "http://www.atmovies.com.tw/movie/next/"
   Data = requests.get(url)
@@ -373,6 +375,10 @@ def cup():
             "message": msg
         }
         
+    return render_template('cup.html', result=result)
+
+
+
     return render_template('cup.html', result=result)
 if __name__ == "__main__":
     app.run(debug=True)
