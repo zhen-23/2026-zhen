@@ -34,34 +34,27 @@ def index():
 def demo():
     return render_template("demo.html")
 
+@app.route("/demo")
+
 @app.route("/webhook", methods=["POST"])
-def webhook():
-    req = request.get_json(force=True)
-    action = req["queryResult"]["action"]
-    
-    if (action == "rateChoice"):
+if (action == "rateChoice"):
         rate = req["queryResult"]["parameters"]["rate"]
         
-        # 1. 連接到 Firestore
         db = firestore.client()
         
-        # 2. 去「本週新片含分級」集合搜尋符合分級的電影
-        # 注意：這裡的 "rate" 必須與你爬蟲存入的 key 值一模一樣
         docs = db.collection("本週新片含分級").where("rate", "==", rate).get()
         
-        info = f"我是蔡純珍設計的機器人。為您找到分級為【{rate}】的電影如下：\n"
+        info = f"我是蔡純珍設計的機器人。為您找到分級為【{rate}】的電影如下：\n\n"
         
-        # 3. 跑迴圈把所有找到的電影標題 (title) 接起來
         for doc in docs:
             movie_data = doc.to_dict()
-            info += "電影名稱：" + movie_data["title"] + "\n"
+            info += "🎬 電影名稱：" + movie_data["title"] + "\n"
+            info += "📅 上映日期：" + movie_data.get("showDate", "暫無資料") + "\n"
+            info += "🔗 線上介紹：" + movie_data.get("hyperlink", "暫無資料") + "\n"
+            info += "------------------------\n"
         
-        # 4. 如果沒找到任何電影
         if len(docs) == 0:
             info = f"目前資料庫中沒有分級為【{rate}】的本週新片喔！"
-
-    return make_response(jsonify({"fulfillmentText": info}))
-
 
 @app.route("/rate")
 def rate():
@@ -317,7 +310,7 @@ def today():
 
 @app.route("/me")
 def about():
-    return render_template("mis2a.html")
+    return render_template("me.html")
 
 @app.route("/welcome", methods=["GET"])
 def welcome():
