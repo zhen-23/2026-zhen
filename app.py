@@ -34,27 +34,31 @@ def index():
 def demo():
     return render_template("demo.html")
 
-@app.route("/demo")
-
 @app.route("/webhook", methods=["POST"])
-if (action == "rateChoice"):
-        rate = req["queryResult"]["parameters"]["rate"]
-        
+def webhook():
+    # build a request object
+    req = request.get_json(force=True)
+    # fetch queryResult from json
+    action =  req["queryResult"]["action"]
+    #msg =  req["queryResult"]["queryText"]
+    #info = "我是楊子青設計的電影聊天機器人, 動作：" + action + "； 查詢內容：" + msg
+    if (action == "rateChoice"):
+        rate =  req["queryResult"]["parameters"]["rate"]
+        info = "我是楊子青設計的電影聊天機器人,您選擇的電影分級是：" + rate + "，相關電影：\n"
+
         db = firestore.client()
-        
-        docs = db.collection("本週新片含分級").where("rate", "==", rate).get()
-        
-        info = f"我是蔡純珍設計的機器人。為您找到分級為【{rate}】的電影如下：\n\n"
-        
+        collection_ref = db.collection("本週新片含分級")
+        docs = collection_ref.get()
+        result = ""
         for doc in docs:
-            movie_data = doc.to_dict()
-            info += "🎬 電影名稱：" + movie_data["title"] + "\n"
-            info += "📅 上映日期：" + movie_data.get("showDate", "暫無資料") + "\n"
-            info += "🔗 線上介紹：" + movie_data.get("hyperlink", "暫無資料") + "\n"
-            info += "------------------------\n"
-        
-        if len(docs) == 0:
-            info = f"目前資料庫中沒有分級為【{rate}】的本週新片喔！"
+            dict = doc.to_dict()
+            if rate in dict["rate"]:
+                result += "片名：" + dict["title"] + ";\n"
+                result += "連結：" + dict["hyperlink"] + "\n\n"
+
+        info += result
+
+    return make_response(jsonify({"fulfillmentText": info}))
 
 @app.route("/rate")
 def rate():
