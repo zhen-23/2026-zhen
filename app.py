@@ -30,6 +30,10 @@ app = Flask(__name__)
 def index():
     return render_template("index.html")
 
+@app.route("/demo")
+def demo():
+    return render_template("demo.html")
+
 @app.route("/webhook", methods=["POST"])
 def webhook():
     req = request.get_json(force=True)
@@ -311,7 +315,7 @@ def today():
     now = datetime.now()
     return render_template("today.html", datetime=str(now))
 
-@app.route("/about")
+@app.route("/me")
 def about():
     return render_template("mis2a.html")
 
