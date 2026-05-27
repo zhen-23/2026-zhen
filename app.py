@@ -108,22 +108,29 @@ def webhook():
   else:
         try:
             ai_config = types.GenerateContentConfig(
-                max_output_tokens = 100
+                max_output_tokens = 800
             )
             
-            short_prompt = "請用 40 字以內極其簡短地回答以下問題，並在結尾加上『完整內容請點擊下方連結查看』：" + msg
+            # 用強烈的指令逼 Gemini 以最快速度、不加廢話地寫滿 500 字
+            prompt_500 = (
+                f"請針對問題『{msg}』，直接寫出一篇大約 500 字左右的詳細完整回答。 "
+                "開頭不要廢話，直接進入主題，多用分段或條列說明以加快產生速度，字數一定要充足填滿 500 字。"
+            )
             
             response = client.models.generate_content(
                 model='gemini-3.5-flash',
-                contents=short_prompt,
+                contents=prompt_500,
                 config=ai_config
             )
             
-            info = response.text + "\n\n👉 點此查看 500 字完整詳細報告：https://2026zhen.vercel.app/ask"
+            if response.text:
+                info = response.text
+            else:
+                info = "抱歉，AI 產生內容時發生不預期狀況，請再試一次！"
+                
         except Exception as e:
             info = "AI 處理時發生錯誤：" + str(e)
 
-    # 💡 關鍵修正：建立回應字典並在轉成 json 時加入 ensure_ascii=False，這樣中文字才不會變成亂碼
     response_data = {"fulfillmentText": info}
     return make_response(json.dumps(response_data, ensure_ascii=False))
 
