@@ -105,15 +105,19 @@ def webhook():
 
         info += result
 
-    else:
+   else:
         try:
-            # 1. 調整限制，允許生成足夠的字數
+            # 1. 把最大 token 放大到 700，確保有足夠的空間裝 500 字的中文字
             ai_config = types.GenerateContentConfig(
-                max_output_tokens = 600
+                max_output_tokens = 700
             )
             
-            # 2. 精確引導 Gemini 寫滿 500 字，且結構分明，這樣生成的反應最快
-            rich_prompt = "請針對以下問題，撰寫一篇大約 500 字左右、條列清晰且豐富詳細的回答：" + msg
+            # 2. 修改提示詞：命令它精確寫大約 500 字，並用「條列式、分段落」的方式
+            # 條列式能讓 Gemini 思考速度加快，避免超過 Dialogflow 的 5 秒限制
+            rich_prompt = (
+                "請針對以下問題，撰寫一篇大約 500 字左右、結構分明、詳細且條列清晰的完整回答。 "
+                "記得字數要充足，大約 500 字：\n" + msg
+            )
             
             response = client.models.generate_content(
                 model='gemini-3.5-flash',
