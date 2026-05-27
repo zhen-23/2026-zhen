@@ -107,36 +107,16 @@ def webhook():
         info += result
 
     return make_response(jsonify({"fulfillmentText": info}))
-    
-elif (action == "input.unknown"):
 
-        instruction_text = (
-            "你是一個熱心且知識豐富的專業智慧助理。對於使用者的任何提問，"
-            "不論問題多麼簡短，你的回答都「必須嚴格遵守超過 100 個中文字」的規定。\n\n"
-            "為了解決字數不足的問題，請你一律按照以下「三段式結構」來撰寫回答：\n"
-            "1.【核心解答】：先用 1-2 句話直接回答使用者的問題重點。\n"
-            "2.【詳細延伸】：主動幫使用者補充相關的背景知識、核心特色、或是具體包含哪些項目（這部分請多寫一點）。\n"
-            "3.【貼心建議】：最後加上一句對未來的建議、出路方向或親切的問候語。\n\n"
-            "請將這三部分結合成一個流暢的段落，絕對不要敷衍，一定要寫滿 100 到 200 字。"
-        )
-
-
-        ai_config = types.GenerateContentConfig(
-            max_output_tokens=500, # 放大上限
-            system_instruction=instruction_text
-        )
-
-        response_stream = client.models.generate_content_stream(
-            model='gemini-2.5-flash', 
-            contents=req["queryResult"]["queryText"],
-            config=ai_config,
-        )
-
-        info = ""
-        for chunk in response_stream:
-            # 安全檢查：確保 chunk.text 不是 None 再加進去
-            if chunk.text:
-                info += chunk.text
+else:
+        try:
+            response = client.models.generate_content(
+                model='gemini-3.5-flash',
+                contents=msg, # <-- 把使用者輸入的 msg 丟給 Gemini
+            )
+            info = response.text
+        except Exception as e:
+            info = "AI 處理時發生錯誤：" + str(e)
 
     return make_response(jsonify({"fulfillmentText": info}))
 
