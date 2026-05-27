@@ -1,4 +1,11 @@
-import requests
+#pip install google-genai
+from google import genai
+
+from google.genai import types
+
+#from PIL import Image
+#import numpy as np, easyocr
+
 from bs4 import BeautifulSoup
 
 from flask import Flask, render_template, request, make_response, jsonify
