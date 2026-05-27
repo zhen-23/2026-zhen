@@ -85,14 +85,12 @@ def demo():
 @app.route("/webhook", methods=["POST"])
 def webhook():
     req = request.get_json(force=True)
-    
     action = req["queryResult"]["action"]
-    msg = req["queryResult"]["queryText"]
+    msg = req["queryResult"]["action"]
     
     if (action == "rateChoice"):
         rate = req["queryResult"]["parameters"]["rate"]
         info = "我是蔡純珍設計的電影聊天機器人,您選擇的電影分級是：" + rate + "，相關電影：\n"
-
         db = firestore.client()
         collection_ref = db.collection("本週新片含分級")
         docs = collection_ref.get()
@@ -102,15 +100,13 @@ def webhook():
             if rate in movie_dict["rate"]:
                 result += "片名：" + movie_dict["title"] + ";\n"
                 result += "連結：" + movie_dict["hyperlink"] + "\n\n"
-
         info += result
-
-  else:
+    else:
         try:
             ai_config = types.GenerateContentConfig(
-                max_output_tokens = 500
+                max_output_tokens = 800
             )
-            prompt_work = f"請針對問題『{msg}』，寫出一篇大約 300 字左右的詳細特色說明。開頭不要廢話，多用分段或條列說明，字數一定要充足填滿。"
+            prompt_work = f"請針對問題『{msg}』，用繁體中文直接寫出一篇大約 500 字左右的詳細介紹。請直接分段、條列重點（例如課程特色、就業方向），不要說任何廢話，速度越快越好。"
             response = client.models.generate_content(
                 model='gemini-3.5-flash',
                 contents=prompt_work,
