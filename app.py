@@ -105,34 +105,24 @@ def webhook():
 
         info += result
 
-    else:
+   else:
         try:
             ai_config = types.GenerateContentConfig(
-                max_output_tokens = 800
+                max_output_tokens = 150
             )
-            
-            prompt_500 = (
-                f"請針對問題『{msg}』，直接寫出一篇大約 500 字左右的詳細完整回答。 "
-                "開頭不要廢話，直接進入主題，多用分段或條列說明，字數一定要充足填滿 500 字。"
-            )
-            
+            short_prompt = f"請用 50 字以內極其簡短地概括回答：『{msg}』，並在最後一句強烈加上：『完整 500 字詳細成果報告請點選下方連結查看！』"
             response = client.models.generate_content(
                 model='gemini-3.5-flash',
-                contents=prompt_500,
+                contents=short_prompt,
                 config=ai_config
             )
-            
-            if response.text:
-                info = response.text
-            else:
-                info = "抱歉，AI 產生內容時發生不預期狀況，請再試一次！"
-                
+            info = response.text + "\n\n🔗 點此查看 500 字完整詳細報告：\nhttps://2026zhen.vercel.app/ask"
         except Exception as e:
             info = "AI 處理時發生錯誤：" + str(e)
 
     response_data = {"fulfillmentText": info}
     return make_response(json.dumps(response_data, ensure_ascii=False))
-
+    
 @app.route("/rate")
 def rate():
     #本週新片
