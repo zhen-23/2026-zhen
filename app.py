@@ -84,14 +84,13 @@ def demo():
 
 @app.route("/webhook", methods=["POST"])
 def webhook():
-    # build a request object
     req = request.get_json(force=True)
-    # fetch queryResult from json
-    action =  req["queryResult"]["action"]
-    #msg =  req["queryResult"]["queryText"]
-    #info = "我是蔡純珍設計的電影聊天機器人, 動作：" + action + "； 查詢內容：" + msg
+    
+    action = req["queryResult"]["action"]
+    msg = req["queryResult"]["queryText"]
+    
     if (action == "rateChoice"):
-        rate =  req["queryResult"]["parameters"]["rate"]
+        rate = req["queryResult"]["parameters"]["rate"]
         info = "我是蔡純珍設計的電影聊天機器人,您選擇的電影分級是：" + rate + "，相關電影：\n"
 
         db = firestore.client()
@@ -99,20 +98,18 @@ def webhook():
         docs = collection_ref.get()
         result = ""
         for doc in docs:
-            dict = doc.to_dict()
-            if rate in dict["rate"]:
-                result += "片名：" + dict["title"] + ";\n"
-                result += "連結：" + dict["hyperlink"] + "\n\n"
+            movie_dict = doc.to_dict()
+            if rate in movie_dict["rate"]:
+                result += "片名：" + movie_dict["title"] + ";\n"
+                result += "連結：" + movie_dict["hyperlink"] + "\n\n"
 
         info += result
 
-    return make_response(jsonify({"fulfillmentText": info}))
-
-else:
+    else:
         try:
             response = client.models.generate_content(
                 model='gemini-3.5-flash',
-                contents=msg, # <-- 把使用者輸入的 msg 丟給 Gemini
+                contents=msg,
             )
             info = response.text
         except Exception as e:
