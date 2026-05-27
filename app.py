@@ -107,9 +107,16 @@ def webhook():
 
     else:
         try:
+            
+            ai_config = types.GenerateContentConfig(
+                max_output_tokens = 128
+            )
+            
+            # 呼叫模型時，把 config 帶進去
             response = client.models.generate_content(
                 model='gemini-3.5-flash',
                 contents=msg,
+                config=ai_config
             )
             info = response.text
         except Exception as e:
