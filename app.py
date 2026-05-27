@@ -105,16 +105,17 @@ def webhook():
 
         info += result
 
-  else:
+ else:
         try:
+            # 💡 關鍵：把上限調到 800！這樣中文才能完整吐出 500 字而不會中途被切斷
             ai_config = types.GenerateContentConfig(
                 max_output_tokens = 800
             )
             
-            # 用強烈的指令逼 Gemini 以最快速度、不加廢話地寫滿 500 字
+            # 強烈命令 Gemini 寫滿 500 字
             prompt_500 = (
                 f"請針對問題『{msg}』，直接寫出一篇大約 500 字左右的詳細完整回答。 "
-                "開頭不要廢話，直接進入主題，多用分段或條列說明以加快產生速度，字數一定要充足填滿 500 字。"
+                "開頭不要廢話，直接進入主題，多用分段或條列說明，字數一定要充足填滿 500 字。"
             )
             
             response = client.models.generate_content(
@@ -131,6 +132,7 @@ def webhook():
         except Exception as e:
             info = "AI 處理時發生錯誤：" + str(e)
 
+    # 確保回傳繁體中文不變碼
     response_data = {"fulfillmentText": info}
     return make_response(json.dumps(response_data, ensure_ascii=False))
 
