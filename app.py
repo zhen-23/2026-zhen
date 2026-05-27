@@ -40,6 +40,10 @@ client = genai.Client()
 def index():
     return render_template("index.html")
 
+@app.route("/messenger")
+def messenger():
+    return render_template("messenger.html")
+
 @app.route("/AI")
 def AI():
     # 每次使用者拜訪該路徑時，直接使用全域的 client 呼叫模型
