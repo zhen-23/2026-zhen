@@ -105,30 +105,27 @@ def webhook():
 
         info += result
 
-   else:
+  else:
         try:
-            # 1. 把最大 token 放大到 700，確保有足夠的空間裝 500 字的中文字
             ai_config = types.GenerateContentConfig(
-                max_output_tokens = 700
+                max_output_tokens = 100
             )
             
-            # 2. 修改提示詞：命令它精確寫大約 500 字，並用「條列式、分段落」的方式
-            # 條列式能讓 Gemini 思考速度加快，避免超過 Dialogflow 的 5 秒限制
-            rich_prompt = (
-                "請針對以下問題，撰寫一篇大約 500 字左右、結構分明、詳細且條列清晰的完整回答。 "
-                "記得字數要充足，大約 500 字：\n" + msg
-            )
+            short_prompt = "請用 40 字以內極其簡短地回答以下問題，並在結尾加上『完整內容請點擊下方連結查看』：" + msg
             
             response = client.models.generate_content(
                 model='gemini-3.5-flash',
-                contents=rich_prompt,
+                contents=short_prompt,
                 config=ai_config
             )
-            info = response.text
+            
+            info = response.text + "\n\n👉 點此查看 500 字完整詳細報告：https://2026zhen.vercel.app/ask"
         except Exception as e:
             info = "AI 處理時發生錯誤：" + str(e)
 
-    return make_response(jsonify({"fulfillmentText": info}))
+    # 💡 關鍵修正：建立回應字典並在轉成 json 時加入 ensure_ascii=False，這樣中文字才不會變成亂碼
+    response_data = {"fulfillmentText": info}
+    return make_response(json.dumps(response_data, ensure_ascii=False))
 
 @app.route("/rate")
 def rate():
