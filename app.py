@@ -107,15 +107,17 @@ def webhook():
 
     else:
         try:
-            
+            # 1. 調整限制，允許生成足夠的字數
             ai_config = types.GenerateContentConfig(
-                max_output_tokens = 128
+                max_output_tokens = 600
             )
             
-            # 呼叫模型時，把 config 帶進去
+            # 2. 精確引導 Gemini 寫滿 500 字，且結構分明，這樣生成的反應最快
+            rich_prompt = "請針對以下問題，撰寫一篇大約 500 字左右、條列清晰且豐富詳細的回答：" + msg
+            
             response = client.models.generate_content(
                 model='gemini-3.5-flash',
-                contents=msg,
+                contents=rich_prompt,
                 config=ai_config
             )
             info = response.text
